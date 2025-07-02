@@ -35,9 +35,9 @@ public class ChartView extends VerticalLayout {
             chartList.add(new Div("You: " + userMessage));
 
             try {
-                Byte[] bytes = toolsService.callTool(userMessage);
-                byte[] primitiveBytes = toPrimitiveByteArray(bytes);
-                StreamResource resource = new StreamResource("chart.png", () -> new ByteArrayInputStream(primitiveBytes));
+                BufferedImage bufferedImage = toolsService.callTool2(userMessage);
+                StreamResource resource = createChartResource(bufferedImage, "chart.png");
+                //StreamResource resource = new StreamResource("chart.png", () -> new ByteArrayInputStream(primitiveBytes));
                 Image chartImage = new Image(resource, "Generated Chart");
                 chartImage.setMaxWidth("500px");
                 chartImage.setMaxHeight("400px");
