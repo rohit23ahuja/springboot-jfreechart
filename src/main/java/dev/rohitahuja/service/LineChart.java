@@ -4,30 +4,27 @@ import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.function.Function;
 
-public class ChartFunction implements Function<ChartFunction.Request, BufferedImage> {
-    private static final Logger _log = LoggerFactory.getLogger(ChartFunction.class);
+public class LineChart implements Function<LineChart.Request, BufferedImage> {
+    private static final Logger _log = LoggerFactory.getLogger(LineChart.class);
 
     @Override
-    public BufferedImage apply(ChartFunction.Request request)  {
-        _log.info("Generating bar chart.");
+    public BufferedImage apply(LineChart.Request request) {
+        _log.info("Generating line chart.");
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        for (ChartFunction.Item item : request.data()) {
+        for (LineChart.Item item : request.data()) {
             dataset.addValue(item.value(), item.rowKey(), item.columnKey());
         }
-        logDefaultCategoryDataset(dataset);
-        JFreeChart chart = ChartFactory.createBarChart(
+
+        JFreeChart chart = ChartFactory.createLineChart(
                 request.title(),
                 request.categoryAxisLabel(),
                 request.valueAxisLabel(),
@@ -37,20 +34,7 @@ public class ChartFunction implements Function<ChartFunction.Request, BufferedIm
         return chart.createBufferedImage(600, 400);
     }
 
-    private void logDefaultCategoryDataset(DefaultCategoryDataset dataset) {
-        int rowCount = dataset.getRowCount();
-        int colCount = dataset.getColumnCount();
-        for (int r = 0; r < rowCount; r++) {
-            Comparable<?> rowKey = dataset.getRowKey(r);
-            for (int c = 0; c < colCount; c++) {
-                Comparable<?> columnKey = dataset.getColumnKey(c);
-                Number value = dataset.getValue(r, c);
-                _log.info("Dataset value: [rowKey='{}', columnKey='{}'] = {}", rowKey, columnKey, value);
-            }
-        }
-    }
-
-    @JsonClassDescription("Request to generate a bar chart")
+    @JsonClassDescription("Request to generate a line chart")
     public record Request(@JsonProperty(required = true, value = "title")
                           @JsonPropertyDescription("Title of chart") String title,
                           @JsonProperty(required = true, value = "categoryAxisLabel")
@@ -64,7 +48,7 @@ public class ChartFunction implements Function<ChartFunction.Request, BufferedIm
                                                value – the Number value.
                                                rowKey – the row key in chart .
                                                columnKey – the column key in chart.
-                                  """) List<ChartFunction.Item> data) {
+                                  """) List<LineChart.Item> data) {
     }
 
     @JsonClassDescription("Single value in a chart identified by row key and column key")
@@ -81,4 +65,3 @@ public class ChartFunction implements Function<ChartFunction.Request, BufferedIm
     public record Response(@JsonPropertyDescription("bufferedImage") BufferedImage bufferedImage) {
     }
 }
-

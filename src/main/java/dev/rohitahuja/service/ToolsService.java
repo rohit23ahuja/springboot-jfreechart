@@ -1,13 +1,10 @@
 package dev.rohitahuja.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jfree.chart.JFreeChart;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.ai.tool.metadata.ToolMetadata;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -18,42 +15,53 @@ import java.util.Base64;
 public class ToolsService {
 
     private final ChatClient chatClient;
-    private final ChatClient chatClient2;
 
     public ToolsService(ChatClient.Builder builder, ChatClient.Builder builder2) {
-        this.chatClient = builder
-                .defaultSystem("""
-                You are a helpful AI Assistant that answers based on knowledge available but also utilizes the tools that have been made available.
-                """)
-                .defaultTools(new ChartService())
-                .build();
-        this.chatClient2 = builder2
+        this.chatClient = builder2
                 .defaultSystem("""
                 You are a helpful AI Assistant that answers based on knowledge available but also utilizes the tools that have been made available.
                 """)
                 .build();
     }
 
-    public Byte[] callTool(String message) {
-        return chatClient
-                .prompt()
-                .user(message)
-                .call()
-                .entity(Byte[].class);
-    }
+//    public Byte[] callTool(String message) {
+//        return chatClient
+//                .prompt()
+//                .user(message)
+//                .call()
+//                .entity(Byte[].class);
+//    }
 
-    public BufferedImage callTool2(String message) {
-        String content = chatClient2
+    public BufferedImage callTool(String message) {
+        String content = chatClient
                 .prompt(message)
                 .toolCallbacks(FunctionToolCallback
-                        .builder("generateBarChart", new ChartFunction())
+                        .builder("generateBarChart", new BarChart())
                         .toolMetadata(ToolMetadata.builder()
                                 .returnDirect(true)
                                 .build())
-                        .toolCallResultConverter(new ChartToolCallResultConverter())
+                        //.toolCallResultConverter(new ChartToolCallResultConverter())
                         .description("Generate bar chart")
-                        .inputType(ChartFunction.Request.class)
-                        .build())
+                        .inputType(BarChart.Request.class)
+                        .build(),
+                        FunctionToolCallback
+                                .builder("generateLineChart", new LineChart())
+                                .toolMetadata(ToolMetadata.builder()
+                                        .returnDirect(true)
+                                        .build())
+                                //.toolCallResultConverter(new ChartToolCallResultConverter())
+                                .description("Generate line chart")
+                                .inputType(LineChart.Request.class)
+                                .build(),
+                        FunctionToolCallback
+                                .builder("generatePieChart", new PieChart())
+                                .toolMetadata(ToolMetadata.builder()
+                                        .returnDirect(true)
+                                        .build())
+                                //.toolCallResultConverter(new ChartToolCallResultConverter())
+                                .description("Generate pie chart")
+                                .inputType(PieChart.Request.class)
+                                .build())
                 .call()
                 .content();
         return decodeBase64ToImage(content);
