@@ -4,6 +4,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.general.DefaultPieDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
@@ -34,7 +35,6 @@ public class ChartService {
     ) {}
 
     public record ChartItem(
-
             @ToolParam(description = "value in chart")
             Number value,
             @ToolParam(description = "row key in chart")
@@ -54,39 +54,7 @@ public class ChartService {
         return result;
     }
 
-//    @Tool(description = "Generates a sample line chart")
-//    public JFreeChart getLineChart() {
-//        _log.info("Generating line chart...");
-//        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-//        dataset.addValue(5, "Revenue", "Week 1");
-//        dataset.addValue(7, "Revenue", "Week 2");
-//        dataset.addValue(6, "Revenue", "Week 3");
-//        dataset.addValue(8, "Revenue", "Week 4");
-//
-//        return ChartFactory.createLineChart(
-//                "Weekly Revenue Trend",
-//                "Week",
-//                "Revenue",
-//                dataset
-//        );
-//    }
-//
-//    @Tool(description = "Generates a sample pie chart")
-//    public JFreeChart getPieChart() {
-//        _log.info("Generating pie chart...");
-//        DefaultPieDataset dataset = new DefaultPieDataset();
-//        dataset.setValue("Product A", 40);
-//        dataset.setValue("Product B", 25);
-//        dataset.setValue("Product C", 35);
-//
-//        return ChartFactory.createPieChart(
-//                "Product Sales Share",
-//                dataset,
-//                true, true, false
-//        );
-//    }
-
-    @Tool(description = "Tool to generate a bar chart")
+    //@Tool(description = "Tool to generate a bar chart")
     public Byte[] generateBarChart(ChartRequest request) throws Exception {
         _log.info("Generating bar chart.");
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
@@ -107,6 +75,40 @@ public class ChartService {
         );
         return buildImageResponse(chart);
     }
+
+    //@Tool(description = "Generates a sample line chart")
+    public JFreeChart getLineChart() {
+        _log.info("Generating line chart...");
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        dataset.addValue(5, "Revenue", "Week 1");
+        dataset.addValue(7, "Revenue", "Week 2");
+        dataset.addValue(6, "Revenue", "Week 3");
+        dataset.addValue(8, "Revenue", "Week 4");
+
+        return ChartFactory.createLineChart(
+                "Weekly Revenue Trend",
+                "Week",
+                "Revenue",
+                dataset
+        );
+    }
+
+    //@Tool(description = "Generates a sample pie chart")
+    public JFreeChart getPieChart() {
+        _log.info("Generating pie chart...");
+        DefaultPieDataset dataset = new DefaultPieDataset();
+        dataset.setValue("Product A", 40);
+        dataset.setValue("Product B", 25);
+        dataset.setValue("Product C", 35);
+
+        return ChartFactory.createPieChart(
+                "Product Sales Share",
+                dataset,
+                true, true, false
+        );
+    }
+
+
 
     private Byte[] buildImageResponse(JFreeChart chart) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
